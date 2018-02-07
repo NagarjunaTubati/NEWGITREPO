@@ -1,0 +1,146 @@
+<project name="project" default="all">
+
+ <!--<property name="path-to-ant-contrib" value="${ANT_HOME}\lib"/>-->
+ <property name="path-to-ant-contrib" value="/data/share/antextra"/>
+<!-- <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+  
+  -->
+   <taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${path-to-ant-contrib}/ant-contrib-1.0b3.jar"/>
+			
+		</classpath>
+	</taskdef>
+  
+<target name="all" >
+
+<!-- Build and Deploy properties file -->  
+
+<property file="build_deploy.properties"/>
+<echo message="IDD.name is ${IDD.name}"/>
+<echo message="IDD.exec.group is ${IDD.exec.group}"/>
+
+
+	<touch file="input.properties"/>
+	<propertyfile
+    file="input.properties"
+    comment="input properties for deploy">
+	  <entry  key="idd.name" value="${IDD.name}"/>
+	  <entry  key="idd.exec.group"  value="${IDD.exec.group}"/>
+	  <entry  key="idd.msp1"  value="${MSP1}"/>
+	  <entry  key="idd.msp1.exec.group"  value="${MSP1.exec.group}"/>
+	  <entry  key="0.idd.msp1.bar"  value=""/>
+	  <entry  key="0.idd.msp1.exec.group"  value=""/>
+	  <entry  key="1.idd.msp1.bar"  value=""/>
+	  <entry  key="1.idd.msp1.exec.group"  value=""/>
+	  <entry  key="2.idd.msp1.bar"  value=""/>
+	  <entry  key="2.idd.msp1.exec.group"  value=""/>
+	  <entry  key="3.idd.msp1.bar"  value=""/>
+	  <entry  key="3.idd.msp1.exec.group"  value=""/>
+	  <entry  key="0.idd.msp2.bar"  value=""/>
+	  <entry  key="0.idd.msp2.exec.group"  value=""/>
+	  <entry  key="1.idd.msp2.bar"  value=""/>
+	  <entry  key="1.idd.msp2.exec.group"  value=""/>
+	  <entry  key="2.idd.msp2.bar"  value=""/>
+	  <entry  key="2.idd.msp2.exec.group"  value=""/>
+	  <entry  key="3.idd.msp2.bar"  value=""/>
+	  <entry  key="3.idd.msp2.exec.group"  value=""/>
+	  <entry  key="idd.msp2"  value="${MSP2}"/>
+	  <entry  key="idd.msp2.exec.group"  value="${MSP2.exec.group}"/>
+	  <entry  key="external.bar"  value="${external.bar}"/>
+	  <entry  key="external.bar.exec.group"  value="${external.bar.exec.group}"/>
+   </propertyfile>
+   
+	<antcall target="udate-input-prop"/>
+
+</target>
+
+
+<target name="udate-input-prop">
+<property file="input.properties"/>
+<var name="counter" value="0"/>
+<if>
+ <equals arg1="${idd.msp1}" arg2="" />
+ <then>
+   <echo message="no msp1 to deploy.." />
+  </then>
+  <elseif>
+  <equals arg1="${idd.msp1}" arg2="\" />
+  <then>
+   <echo message="no msp1 to deploy.\." />
+  </then>
+ </elseif>  
+  <else>
+   <echo message="msp1 exists for deployment.." />
+	<for list="${idd.msp1.exec.group}" delimiter=":" param="msp.exec.grp">
+		<sequential>
+			<echo message="${counter}.idd.msp1.exec.group = @{msp.exec.grp}"/>
+			<echo message="" file="input.properties" append="true"/>
+			<echo message="${counter}.idd.msp1.exec.group = @{msp.exec.grp}" file="input.properties" append="true"/>
+			<echo message="" file="input.properties" append="true"/>
+			<propertyregex property="prjname" input="${idd.msp1}" regexp="(.*)_MSP" select="\1" defaultValue="${idd.msp1}" override="yes"/>
+			<echo message="${counter}.idd.msp1.bar = ${prjname}_@{msp.exec.grp}.bar" file="input.properties" append="true"/>
+			<!-- increase the counter -->
+			<math result="counter" 
+			operand1="${counter}" 
+			operation="+" 
+			operand2="1" 
+			datatype="int"/>
+		  
+		</sequential>
+	
+	</for>
+ </else>
+</if>
+
+<var name="counter" value="0"/>
+<if>
+ <equals arg1="${idd.msp2}" arg2="" />
+ <then>
+   <echo message="no msp2 to deploy.." />
+  </then>
+  <elseif>
+  <equals arg1="${idd.msp2}" arg2="\\" />
+  <then>
+   <echo message="no msp2 to deploy.\." />
+  </then>
+ </elseif>
+  <else>
+   <echo message="msp2 exists for deployment.." />
+	<for list="${idd.msp2.exec.group}" delimiter=":" param="msp.exec.grp">
+		<sequential>
+			<echo message="${counter}.idd.msp2.exec.group = @{msp.exec.grp}"/>
+			<echo message="" file="input.properties" append="true"/>
+			<echo message="${counter}.idd.msp2.exec.group = @{msp.exec.grp}" file="input.properties" append="true"/>
+			<echo message="" file="input.properties" append="true"/>
+			<propertyregex property="prjname" input="${idd.msp2}" regexp="(.*)_MSP" select="\1" defaultValue="${idd.msp2}" override="yes"/>
+			<echo message="${counter}.idd.msp2.bar = ${prjname}_@{msp.exec.grp}.bar" file="input.properties" append="true"/>
+			<!-- increase the counter -->
+			<math result="counter" 
+			  operand1="${counter}" 
+			  operation="+" 
+			  operand2="1" 
+			  datatype="int"/>
+			  
+		</sequential>
+		
+	</for>
+ </else>
+</if>
+
+ 
+</target>
+
+<!--
+<target name="udate-input-prop-bar">
+	<property file="input.properties"/>
+	<propertyregex property="prjname" input="${idd.msp1}" regexp="(.*)_MSP" select="\1" defaultValue="${idd.msp1}" override="yes"/>
+	<property name="bar.file.name.updated" value="${prjname}_@{exec.group}"/>
+	<echo message="" file="input.properties" append="true"/>
+	<echo message="idd.msp1.bar = ${prjname}_@{exec.group}" file="input.properties" append="true"/>
+</target>
+-->
+
+</project>
